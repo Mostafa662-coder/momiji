@@ -1,0 +1,113 @@
+name: Build TV APK with game translator
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Apply game-translator patch
+        run: |
+          cat > patch.b64 <<'B64'
+          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
+          B64
+          base64 -d patch.b64 | gunzip > translator.patch
+          git apply --verbose translator.patch
+          rm patch.b64 translator.patch
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: android-actions/setup-android@v3
+
+      - name: NDK and CMake
+        run: sdkmanager "ndk;26.1.10909125" "cmake;3.22.1"
+
+      - name: nanopb Python deps
+        run: pip install protobuf grpcio-tools
+
+      - name: Build APK (debug-signed, installs directly)
+        working-directory: android
+        run: chmod +x gradlew && ./gradlew --no-daemon assembleFdroidDebug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: momiji-translator-apk
+          path: android/app/build/outputs/apk/fdroid/debug/*.apk
