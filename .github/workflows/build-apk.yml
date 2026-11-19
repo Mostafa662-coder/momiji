@@ -105,9 +105,24 @@ jobs:
       - name: nanopb Python deps
         run: pip install protobuf grpcio-tools
 
+      - name: Maven Central mirror (direct Maven Central refuses runner requests)
+        run: |
+          mkdir -p ~/.gradle/init.d
+          cat > ~/.gradle/init.d/mirror.gradle <<'G'
+          def mirrors = ['https://maven-central.storage-download.googleapis.com/maven2/', 'https://maven-central-eu.storage-download.googleapis.com/maven2/']
+          beforeSettings { settings ->
+            settings.pluginManagement.repositories { mirrors.each { m -> maven { url m } }; gradlePluginPortal() }
+          }
+          allprojects {
+            buildscript { repositories { mirrors.each { m -> maven { url m } } } }
+            repositories { mirrors.each { m -> maven { url m } } }
+          }
+          G
+          cat ~/.gradle/init.d/mirror.gradle
+
       - name: Build APK (debug-signed, installs directly)
         working-directory: android
-        run: chmod +x gradlew && ./gradlew --no-daemon assembleFdroidDebug
+        run: chmod +x gradlew && ./gradlew --no-daemon --stacktrace assembleFdroidDebug
 
       - uses: actions/upload-artifact@v4
         with:
