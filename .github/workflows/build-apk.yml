@@ -102,8 +102,12 @@ jobs:
           yes | "$SDKM" --licenses > /dev/null || true
           "$SDKM" "ndk;26.1.10909125" "cmake;3.22.1"
 
-      - name: nanopb Python deps
-        run: pip install protobuf grpcio-tools
+      - name: Native build tools (protoc for nanopb)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq protobuf-compiler
+          protoc --version
+          pip install protobuf grpcio-tools
 
       - name: Maven Central mirror (direct Maven Central refuses runner requests)
         run: |
