@@ -96,6 +96,11 @@ jobs:
           git apply --verbose settings.patch
           rm settings.patch
 
+      - name: App name
+        run: |
+          sed -i 's|<string name="app_name" translatable="false">[^<]*</string>|<string name="app_name" translatable="false">Hero Trans APP</string>|' android/app/src/main/res/values/strings.xml
+          grep -q 'Hero Trans APP' android/app/src/main/res/values/strings.xml
+
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -136,5 +141,5 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: momiji-translator-apk
+          name: hero-trans-app-apk
           path: android/app/build/outputs/apk/fdroid/debug/*.apk
